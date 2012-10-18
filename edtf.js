@@ -228,7 +228,7 @@
       case null:
       case 'uu':
         date.setMonth(0);
-        date.setMonth(0);
+        date.setDate(1);
         break;
       case 21:
         date.setMonth(2);
