@@ -197,9 +197,9 @@
 
   var EDTFDate = function (data) {
 
-    this.year = data.hasOwnProperty('year') ? '' + data.year : null;
-    this.month = data.hasOwnProperty('month') ? zeroPadded(data.month) : null;
-    this.day = data.hasOwnProperty('day') ? zeroPadded(data.day) : null;
+    this.year = data.year ? '' + data.year : null;
+    this.month = data.year ? zeroPadded(data.month) : null;
+    this.day = data.year ? zeroPadded(data.day) : null;
     this.uncertain = !!data.uncertain;
     this.approximate = !!data.approximate;
     this.open = !!data.open;
