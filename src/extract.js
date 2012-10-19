@@ -41,6 +41,20 @@ var tokenGroups = {
   ]
 }
 
+var allRegexes = new RegExp([]
+  .concat(
+      tokenGroups.approximate
+    , tokenGroups.uncertain
+    , tokenGroups.indicators
+    , tokenGroups.year
+    , tokenGroups.month
+    , tokenGroups.seasons
+    )
+  .map(function(t) {
+    return s.source
+  })
+  .join('|'), 'i');
+
 /**
  * Find the first match between a list of tokens and a list of regexs.
  *
