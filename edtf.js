@@ -41,7 +41,17 @@
       /^win(?:ter)?$/i
     ]
   }
-
+  
+  /**
+   * Find the first match between a list of tokens and a list of regexs.
+   *
+   * @param tokens {String|String[]} String(s) to be searched
+   * @param regexArray {RegExp[]} Expressions for strings to be tested against
+   *
+   * @returns False if no match, otherwise an object of the matched string and
+   *     the index of the regex pattern in the regexArray
+   *
+   */
   function matchInArray(tokens, regexArray) {
     var match = false
       , idx
@@ -139,7 +149,7 @@
   }
 
   /**
-   * Function to check if a day actually existed
+   * Check if a day actually existed
    *
    * The reason I'm setting the year as 2012 initially is that the javascript
    * date parser does a lot of weird things. According the the article linked
@@ -212,6 +222,7 @@
     toNativeDate: function () {
       var date = new Date(0);
 
+      // js Date type can't represent these cases
       if (this.unknown || this.open) {
         return null;
       }
@@ -225,11 +236,15 @@
       date.setFullYear(this.year);
 
       switch (this.month) {
+
+      // If month is not set or is 'uu', pretend it's January 1.
       case null:
       case 'uu':
         date.setMonth(0);
         date.setDate(1);
         break;
+
+      // Assuming northern hemisphere for seasons.
       case 21:
         date.setMonth(2);
         date.setDate(22);
@@ -246,6 +261,8 @@
         date.setMonth(11);
         date.setDate(22);
         break;
+
+      // Month is set; if day is not set or is 'uu', pretend it's the first.
       default:
         date.setMonth(parseInt(this.month, 10) - 1);
         if (this.day === null || this.day === 'uu') {
