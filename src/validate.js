@@ -1,3 +1,54 @@
+function uncertainOrApproximateParts(str) {
+  var grouped
+    , affected
+    , results = []
+    , affectedGroups 
+
+  // Make a string where every ? or ~ marker applies to a group in parentheses
+  grouped = str
+    .replace(/(^|-)([0-9u\-]+)([?~])/g, '$1($2)$3')
+    .replace(/~\?/g, '?~'); // Processing marks in ?, ~ order
+
+  // Replace each part with T$index, to end up with, e.g.:
+  // (T0-T1)?-T2 or (T0)?~-(T1-T2)~
+  for (var i = 0; i < str.match(/[0-9u]+/g).length; i++) {
+    grouped = grouped.replace(/(^|[^T])([0-9u]+)/, '$1T' + i);
+    results[i] = {uncertain: false, approximate: false};
+  }
+
+  // This will give the indices of the sections affected by the leftmost
+  // instance of the provided token.
+  affectedGroups = function (token) {
+    var tmpstr;
+    tmpstr = grouped.slice(0, grouped.indexOf(')' + token) + 1);
+    tmpstr = tmpstr.replace(/\((.*)\)/, '$1');
+    return tmpstr.replace(/[^0-9]/g, '').split(/\B/);
+  }
+
+  // These two might be written better with recursion
+  if (str.indexOf('?') >= 0) {
+    for (var i = 0; i < str.match(/\?/g).length; i++) {
+      affected = affectedGroups('?');
+      for (var j = 0; j < affected.length; j++) {
+        results[affected[j]].uncertain = true;
+      }
+      grouped = grouped.replace('?', '');
+    }
+  }
+
+  if (str.indexOf('~') >= 0) {
+    for (var i = 0; i < str.match(/~/g).length; i++) {
+      affected = affectedGroups('~');
+      for (var j = 0; j < affected.length; j++) {
+        results[affected[j]].approximate = true;
+      }
+      grouped = grouped.replace('~', '');
+    }
+  }
+
+  return results
+}
+
 function validateSingleDate(dateString) {
   var verdict
     , sepMarks = dateString.split(/([?~]*)$/)
