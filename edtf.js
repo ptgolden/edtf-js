@@ -79,7 +79,7 @@
     return j;
   }
 
-  function getNumericalTokens(tokens) {
+  function numericalTokens(tokens) {
     var numericalTokens = [];
     for (var i = 0; i < tokens.length; i++) {
       if (tokens[i].match(/^[0-9]+$/)) {
@@ -89,18 +89,27 @@
     return numericalTokens;
   }
 
+  /**
+   * Match list of tokens against regexes for years
+   */
   function getYear(tokens) {
     var y = matchInArray(tokens, tokenGroups.year);
     return y && y.token;
   }
 
+  /**
+   * Given a list of tokens (year removed), return the month
+   *
+   * @returns {Object} Month as represented by 01-12, as well as the token of
+   *     the month in the list of tokens (e.g. May, Summer, Sep., 3)
+   */
   function getMonth(tokens, monthFirst) {
     var month
       , monthToken
       , m
       , months = tokenGroups.months
       , seasons = tokenGroups.seasons
-      , numericalTokens = getNumericalTokens(tokens)
+      , numericalTokens = numericalTokens(tokens)
 
     if (numericalTokens.length === 2) {
       month = monthToken = tokens[monthFirst ? 0 : 1];
@@ -133,7 +142,7 @@
   function getDay(tokens) {
     var day
       , dayToken
-      , numericalTokens = getNumericalTokens(tokens)
+      , numericalTokens = numericalTokens(tokens)
 
     if (numericalTokens.length === 1) {
       day = dayToken = (
@@ -366,7 +375,7 @@
     return !!verdict;
   }
 
-  var validate = function (str) {
+  var validateEDTF = function (str) {
     var verdict
       , intervals = str.split('/')
     
@@ -389,7 +398,7 @@
     return !!verdict;
   }
 
-  var parse = function (string) {
+  var parseDateString = function (string) {
     var tokens
       , tokensCopy
       , validDate = true
@@ -452,7 +461,7 @@
       }
       
       if (!('month' in edtfObj)) {
-        month = getMonth(tokens, getNumericalTokens(tokensCopy).indexOf(edtfObj.year) === 2);
+        month = getMonth(tokens, numericalTokens(tokensCopy).indexOf(edtfObj.year) === 2);
         if (month && tokens.indexOf(month.token) >= 0) {
           tokens.splice(tokens.indexOf(month.token), 1);
           edtfObj.month = month.month;
@@ -490,7 +499,7 @@
     return validDate ? new EDTFDate(edtfObj) : null;
   }
 
-  exports.parse = parse;
-  exports.validate = validate;
+  exports.parseDateString = parse;
+  exports.validateEDTF = validateEDTF;
 
 })(typeof(exports) === 'undefined' ? this.edtf = {} : exports);
